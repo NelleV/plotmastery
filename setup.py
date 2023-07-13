@@ -1,7 +1,7 @@
 import os
 import sys
 
-DISTNAME = 'trying'
+DISTNAME = 'plotmastery'
 DESCRIPTION = 'Utility functions to make publication quality figures.'
 MAINTAINER = 'Nelle Varoquaux'
 MAINTAINER_EMAIL = 'nelle.varoquaux@gmail.com'
@@ -44,7 +44,7 @@ def configuration(parent_package='', top_path=None):
                        delegate_options_to_subpackages=True,
                        quiet=True)
 
-    config.add_subpackage('trying')
+    config.add_subpackage('plotmastery')
 
     return config
 
