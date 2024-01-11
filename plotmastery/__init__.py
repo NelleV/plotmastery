@@ -1,2 +1,3 @@
 from . import utils_subfigure
-from .heatmap import heatmap
+from ._heatmap import heatmap
+from . import _colors as colors

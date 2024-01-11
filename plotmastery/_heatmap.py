@@ -24,6 +24,6 @@ def heatmap(X, row_annotation=None, col_annotation=None):
 
 
 def _heatmap(X, ax):
-    ax.matshow(X)
+    ax.imshow(X)
     ax.set_xticks([])
     ax.set_yticks([])
