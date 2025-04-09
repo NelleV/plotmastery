@@ -35,6 +35,9 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
     if not isinstance(data, (list, np.ndarray)):
         data = im.get_array()
 
+    # Get extent of the images to know where to put the text:
+    x_min, x_max, y_min, y_max = im.get_extent()
+
     # Normalize the threshold to the images color range.
     if threshold is not None:
         threshold = im.norm(threshold)
@@ -54,14 +57,23 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
     # Loop over the data and create a `Text` for each "pixel".
     # Change the text's color depending on the data.
     texts = []
+    x_ranges = np.linspace(x_min, x_max, data.shape[1] + 1)
+    y_ranges = np.linspace(y_min, y_max, data.shape[0] + 1)[::-1]
+
+    # Center
+    x_ranges += (x_ranges[1] - x_ranges[0])/2
+    y_ranges += (y_ranges[1] - y_ranges[0])/2
+
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
 
             kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
             if data[i, j] == 0:
-                text = im.axes.text(j, i, ".", **kw)
+                text = im.axes.text(x_ranges[j], y_ranges[i], ".", **kw)
             else:
-                text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
+                text = im.axes.text(
+                    x_ranges[j], y_ranges[i],
+                    valfmt(data[i, j], None), **kw)
             texts.append(text)
 
     return texts
