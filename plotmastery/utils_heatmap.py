@@ -5,31 +5,52 @@ from sklearn.cluster import AgglomerativeClustering
 
 
 def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
+                     dot_instead_of_zeros=False,
                      textcolors=("black", "white"),
                      threshold=None, **textkw):
     """
-    A function to annotate a heatmap.
+    Annotate a heatmap with text labels for each cell.
+
+    This function adds text annotations to a heatmap image, placing formatted
+    values at the center of each cell. Text color is determined by comparing
+    cell values to a threshold to enhance readability.
 
     Parameters
     ----------
-    im
-        The AxesImage to be labeled.
-    data
-        Data used to annotate.  If None, the image's data is used.  Optional.
-    valfmt
-        The format of the annotations inside the heatmap.  This should either
-        use the string format method, e.g. "$ {x:.2f}", or be a
-        `matplotlib.ticker.Formatter`.  Optional.
-    textcolors
-        A pair of colors.  The first is used for values below a threshold,
-        the second for those above.  Optional.
-    threshold
-        Value in data units according to which the colors from textcolors are
-        applied.  If None (the default) uses the middle of the colormap as
-        separation.  Optional.
-    **kwargs
-        All other arguments are forwarded to each call to `text` used to create
-        the text labels.
+    im : matplotlib.image.AxesImage
+        The AxesImage object representing the heatmap to be annotated.
+    data : array-like, optional
+        Data used to annotate. If None, the image's data array is used.
+        Should have same shape as the heatmap. Default is None.
+    valfmt : str or matplotlib.ticker.Formatter, default="{x:.2f}"
+        Format specification for the annotations. Can be a format string
+        (e.g., "$ {x:.2f}") or a matplotlib.ticker.Formatter instance.
+    dot_instead_of_zeros : bool, default=False
+        If True, zero values are displayed as dots instead of their numeric value.
+    textcolors : tuple of str, default=("black", "white")
+        Pair of colors for the text annotations. The first color is used for
+        values below the threshold, the second for values above the threshold.
+    threshold : float, optional
+        Threshold value in data units for choosing text color. If None (default),
+        the midpoint of the colormap range is used as the threshold.
+    **textkw : dict
+        Additional keyword arguments passed to matplotlib.axes.Axes.text(),
+        such as fontsize, fontweight, rotation, etc.
+
+    Returns
+    -------
+    list of matplotlib.text.Text
+        List of Text objects representing the annotations, one for each cell
+        in the heatmap.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> fig, ax = plt.subplots()
+    >>> data = np.random.rand(5, 5)
+    >>> im = ax.imshow(data)
+    >>> texts = annotate_heatmap(im, data, valfmt="{x:.1f}")
     """
 
     if not isinstance(data, (list, np.ndarray)):
@@ -68,7 +89,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
         for j in range(data.shape[1]):
 
             kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
-            if data[i, j] == 0:
+            if data[i, j] == 0 and dot_instead_of_zeros:
                 text = im.axes.text(x_ranges[j], y_ranges[i], ".", **kw)
             else:
                 text = im.axes.text(
@@ -94,10 +115,11 @@ def order_rows(data, linkage="single", metric="manhattan"):
     return data
 
 
-def order_rows_and_columns(data, linkage="single"):
+def order_rows_and_columns(data, linkage="single", connectivity=None):
     clst = AgglomerativeClustering(
         compute_full_tree=True,
         metric="precomputed",
+        connectivity=connectivity,
         linkage=linkage).fit(data)
     n_samples = data.shape[0]
     t = clst.children_.flatten()
