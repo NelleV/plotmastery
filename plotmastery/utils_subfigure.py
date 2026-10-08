@@ -1,6 +1,7 @@
 
 
-def add_letter_and_title(ax, letter, title=None, extra_x_shift=0,
+def add_letter_and_title(ax, letter, title=None, 
+                         letter_extra_x_shift=0,           title_extra_x_shift=0,
                          fontsize="medium"):
     """
     Add letter and title on an axis, positionned exactly at same shift.
@@ -8,7 +9,7 @@ def add_letter_and_title(ax, letter, title=None, extra_x_shift=0,
     x1, y1 = ax.transAxes.transform_point((0, 1))
     # Shift 0.4 inch on the x-axis and 0.1 inch on the y-axis
     x, y = ax.transAxes.inverted().transform_point(
-        (x1 - 45 + extra_x_shift, y1 + 10))
+        (x1 - 45 + letter_extra_x_shift, y1 + 10))
     ax.text(
         x, y,
         letter, fontweight="bold", fontsize=fontsize,
@@ -17,7 +18,7 @@ def add_letter_and_title(ax, letter, title=None, extra_x_shift=0,
 
     if title is not None:
         x, y = ax.transAxes.inverted().transform_point(
-            (x1 + extra_x_shift, y1 + 10))
+            (x1 + title_extra_x_shift, y1 + 10))
         ax.text(
             x, y,
             title, fontweight="bold", fontsize=fontsize,
